@@ -9,6 +9,7 @@ class ComponenteTareas extends Component
 {
 
     public $tareas;
+    public $busqueda = '';
 
     public function mount()
     {
@@ -36,6 +37,16 @@ class ComponenteTareas extends Component
     {
         Tareas::destroy($id);
         $this->tareas = Tareas::all();
+    }
+
+    public function buscar()
+    {
+        if (empty($this->busqueda)) {            
+            $this->tareas = Tareas::all();
+        }else{
+            $this->tareas = Tareas::where('nombre', 'like', '%' . $this->busqueda . '%')->
+            orwhere('estado', 'like', '%' . $this->busqueda . '%')->get();
+        }
     }
     
     public function render()
