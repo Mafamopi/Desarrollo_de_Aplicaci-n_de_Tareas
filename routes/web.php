@@ -2,9 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\ComponenteTareas;
- 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::redirect('/', '/componente-tareas');
 
 Route::get('/componente-tareas', ComponenteTareas::class);

@@ -1,5 +1,11 @@
 <div x-data="{ open: false, tareaId: null, tareaNombre: '', tareaEstado: '' }" class="container mx-auto mt-5 p-5 bg-gray-100 rounded shadow">
-    <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Agregar tarea</button>
+    <div class="flex justify-between items-center mb-4">
+        <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Agregar tarea</button>
+        
+        <button wire:click="exportarTareas" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center">
+            <i class="fas fa-file-excel mr-2"></i> Exportar a Excel
+        </button>
+    </div>
 
     <div x-show="open" @click.away="open = false" class="mt-3 p-3 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div class="mb-4">
@@ -16,14 +22,13 @@
         </div>
         <button @click="open = false; $wire.saveTarea(tareaId, tareaNombre, tareaEstado)" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
     </div>
-
     <div class="w-full flex justify-end my-4">
         <div class="flex items-center">
             <input type="text" wire:model="busqueda" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             <button wire:click="buscar" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Buscar</button>
         </div>
     </div>
-    {{ $busqueda }}
+
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
