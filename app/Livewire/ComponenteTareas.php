@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use Livewire\WithFileDownload;
 use Livewire\Component;
+use Livewire\WithFileDownload;
 use App\Models\Tareas;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -20,22 +20,30 @@ class ComponenteTareas extends Component
         $this->tareas = Tareas::all();
     }
 
-    public function saveTarea($id, $nombre, $estado)
+    public function saveTarea($tareaId, $tareaNombre, $tareaEstado)
     {
-
-        if (empty($nombre) || empty($estado)){
-            throw new Exception("Los campos de nombre y estado no pueden estar vacios.");            
+        if (empty($tareaNombre) || empty($tareaEstado)){
+            throw new Exception("Los campos de nombre y estado no pueden estar vacíos.");            
         }
 
-        if ($id) {
-            $tarea = Tareas::find($id);
-            $tarea->update(['nombre' => $nombre, 'estado' => $estado]);
+        if ($tareaId) {
+            $tarea = Tareas::find($tareaId);
+            if ($tarea) {
+                $tarea->update(['nombre' => $tareaNombre, 'estado' => $tareaEstado]);
+            } else {
+                throw new Exception("No se encontró la tarea con el ID proporcionado.");
+            }
         } else {
-            Tareas::create(['nombre' => $nombre, 'estado' => $estado]);
+            Tareas::create(['nombre' => $tareaNombre, 'estado' => $tareaEstado]);
         }
 
         $this->tareas = Tareas::all();
+        
+        $this->tareaId = null;
+        $this->tareaNombre = '';
+        $this->tareaEstado = '';
     }
+
 
     public function deleteTarea($id)
     {
@@ -91,7 +99,7 @@ class ComponenteTareas extends Component
             ]
         );
     }
-    
+
     public function render()
     {
         return view('livewire.componente-tareas');

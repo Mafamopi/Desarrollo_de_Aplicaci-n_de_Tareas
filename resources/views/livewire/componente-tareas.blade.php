@@ -1,6 +1,6 @@
-<div x-data="{ open: false, tareaId: null, tareaNombre: '', tareaEstado: '' }" class="container mx-auto mt-5 p-5 bg-gray-100 rounded shadow">
+<div x-data="{ open: false, tareaId: null, tareaNombre: '', tareaEstado: '', showConfirmation: false, actionType: '', tareaToDelete: null }" class="container mx-auto mt-5 p-5 bg-gray-100 rounded shadow">
     <div class="flex justify-between items-center mb-4">
-        <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Agregar tarea</button>
+        <button @click="open = true; tareaId = null; tareaNombre = ''; tareaEstado = ''; actionType = 'save'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Agregar tarea</button>
         
         <button wire:click="exportarTareas" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center">
             <i class="fas fa-file-excel mr-2"></i> Exportar a Excel
@@ -20,8 +20,28 @@
                 <option value="completada">Completada</option>
             </select>
         </div>
-        <button @click="open = false; $wire.saveTarea(tareaId, tareaNombre, tareaEstado)" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
+        <button @click="actionType = tareaId ? 'edit' : 'save'; showConfirmation = true" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
     </div>
+
+    <div x-show="showConfirmation" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
+            <h1 class="text-2xl font-bold mb-4">Confirmar acción</h1>
+            <p x-text="actionType === 'delete' ? '¿Está seguro de que desea eliminar la tarea?' : (actionType === 'edit' ? '¿Está seguro de que desea editar la tarea?' : '¿Está seguro de que desea guardar la tarea?')" class="text-gray-700 mb-4"></p>
+            <div class="flex justify-end">
+                <button @click="showConfirmation = false" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2">Cancelar</button>
+                <template x-if="actionType === 'delete'">
+                    <button @click="$wire.deleteTarea(tareaToDelete); showConfirmation = false" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Eliminar</button>
+                </template>
+                <template x-if="actionType === 'edit'">
+                    <button @click="$wire.saveTarea(tareaId, tareaNombre, tareaEstado); showConfirmation = false" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Editar</button>
+                </template>
+                <template x-if="actionType === 'save'">
+                    <button @click="$wire.saveTarea(null, tareaNombre, tareaEstado); showConfirmation = false" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Guardar</button>
+                </template>
+            </div>
+        </div>
+    </div>
+
     <div class="w-full flex justify-end my-4">
         <div class="flex items-center">
             <input type="text" wire:model="busqueda" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -45,8 +65,8 @@
                             @foreach($tareas as $tarea)                            
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button @click="open = true; tareaId = {{ $tarea->id }}; tareaNombre = '{{ $tarea->nombre }}'; tareaEstado = '{{ $tarea->estado }}'" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Editar</button>
-                                        <button @click="$wire.deleteTarea({{ $tarea->id }})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar</button>
+                                        <button @click="tareaId = {{ $tarea->id }}; tareaNombre = '{{ $tarea->nombre }}'; tareaEstado = '{{ $tarea->estado }}'; tareaToDelete = {{ $tarea->id }}; actionType = 'edit'; open = true" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Editar</button>
+                                        <button @click="tareaToDelete = {{ $tarea->id }}; actionType = 'delete'; showConfirmation = true" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar</button>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $tarea->nombre }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $tarea->estado }}</td>
